@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sentinel · Transaction Risk Intelligence</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#07090D;--bg2:#0C1017;--glass:rgba(255,255,255,.04);--bd:rgba(255,255,255,.08);--tx:#F5F7FA;--tx2:#8B93A7;--cy:#22d3ee;--vi:#8b5cf6;--lo:#34d399;--me:#fbbf24;--hi:#f87171}
+*{box-sizing:border-box;margin:0}html,body{height:100%}
+body{font:400 14px/1.5 Manrope,system-ui,sans-serif;color:var(--tx);background:radial-gradient(900px 500px at 80% -10%,rgba(139,92,246,.14),transparent),radial-gradient(700px 400px at 10% 110%,rgba(34,211,238,.09),transparent),var(--bg);display:flex}
+body:before{content:"";position:fixed;inset:0;background:linear-gradient(var(--bd) 1px,transparent 1px) 0 0/48px 48px,linear-gradient(90deg,var(--bd) 1px,transparent 1px) 0 0/48px 48px;opacity:.25;pointer-events:none;mask:radial-gradient(circle at 50% 30%,#000,transparent 75%)}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+:focus-visible{outline:2px solid var(--cy);outline-offset:2px}
+.num{font-variant-numeric:tabular-nums}
+aside{width:224px;flex:none;border-right:1px solid var(--bd);background:rgba(12,16,23,.7);backdrop-filter:blur(14px);padding:22px 14px;display:flex;flex-direction:column;gap:6px;position:relative;z-index:2}
+.logo{display:flex;gap:10px;align-items:center;font-weight:800;font-size:17px;padding:0 8px 18px}
+.logo i{width:30px;height:30px;border-radius:9px;background:conic-gradient(from 200deg,var(--cy),var(--vi),var(--cy));display:grid;place-items:center;box-shadow:0 0 22px rgba(34,211,238,.35)}
+.logo i:after{content:"";width:12px;height:12px;border-radius:50%;background:var(--bg)}
+nav button{display:flex;width:100%;gap:10px;align-items:center;padding:10px 12px;border-radius:10px;color:var(--tx2);transition:.2s;text-align:left}
+nav button:hover{color:var(--tx);background:var(--glass);transform:translateX(2px)}
+nav button.on{color:var(--tx);background:linear-gradient(90deg,rgba(34,211,238,.14),transparent);box-shadow:inset 2px 0 var(--cy)}
+nav b{margin-left:auto;font-size:11px;background:var(--hi);color:#1a0505;border-radius:99px;padding:0 7px}
+.side-foot{margin-top:auto;color:var(--tx2);font-size:12px;padding:10px 8px;border-top:1px solid var(--bd)}
+main{flex:1;min-width:0;height:100vh;overflow:auto;position:relative;z-index:1}
+header{display:flex;flex-wrap:wrap;gap:14px;align-items:center;padding:18px 32px;border-bottom:1px solid var(--bd);position:sticky;top:0;background:rgba(7,9,13,.8);backdrop-filter:blur(12px);z-index:5}
+header h1{font-size:18px;font-weight:700}header small{display:block;color:var(--tx2);font-size:12px}
+.pills{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+.pill{display:flex;gap:7px;align-items:center;font-size:12px;color:var(--tx2);border:1px solid var(--bd);background:var(--glass);border-radius:99px;padding:4px 11px}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--lo);box-shadow:0 0 8px var(--lo)}.dot.live{animation:pulse 1.6s infinite}
+@keyframes pulse{50%{opacity:.35;transform:scale(.7)}}
+.ai{color:var(--cy)}.ai.busy .dot{background:var(--vi);box-shadow:0 0 10px var(--vi)}
+section.view{display:none;padding:28px 32px 60px;gap:20px;flex-direction:column}section.view.on{display:flex}
+.glass{background:var(--glass);border:1px solid var(--bd);border-radius:18px;padding:22px;backdrop-filter:blur(10px);position:relative}
+.lbl{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--tx2);margin-bottom:12px}
+.hero{display:grid;grid-template-columns:1.1fr 1fr;gap:20px;align-items:center;min-height:340px;overflow:hidden}
+.hero h2{font-size:clamp(30px,4vw,48px);line-height:1.05;font-weight:300;letter-spacing:-.03em;max-width:12em}.hero h2 b{font-weight:800}
+.hero p{color:var(--tx2);margin:14px 0 22px;max-width:30em}
+.cta{display:inline-flex;gap:8px;padding:10px 18px;border-radius:99px;border:1px solid var(--cy);color:var(--cy);transition:.2s}.cta:hover{background:rgba(34,211,238,.12)}
+.ringwrap{position:relative;width:min(340px,100%);aspect-ratio:1;margin:auto}
+.ringwrap svg{width:100%;height:100%;overflow:visible}
+.spin{transform-origin:150px 150px;animation:spin 40s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
+.core{position:absolute;inset:0;display:grid;place-content:center;text-align:center}
+.core .big{font-size:clamp(40px,6vw,60px);font-weight:800;letter-spacing:-.04em;transition:color .4s,text-shadow .4s}
+.core .cat{font-size:12px;letter-spacing:.2em;font-weight:700}
+.sat{position:absolute;font-size:11px;color:var(--tx2);transform:translate(-50%,-50%);text-align:center;white-space:nowrap}.sat b{display:block;color:var(--tx);font-size:13px}
+.HIGH{--c:var(--hi)}.MEDIUM{--c:var(--me)}.LOW{--c:var(--lo)}
+.tc{color:var(--c)}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+.metric{padding:18px;border-radius:16px;border:1px solid var(--bd);background:linear-gradient(160deg,rgba(255,255,255,.05),transparent)}
+.metric .v{font-size:28px;font-weight:700;letter-spacing:-.02em}.metric svg{width:100%;height:24px;margin-top:8px}
+.cols{display:grid;grid-template-columns:1.6fr 1fr;gap:20px}
+.pipe{display:flex;gap:6px;align-items:center;overflow-x:auto;padding:6px 2px}
+.node{flex:1;min-width:92px;text-align:center;font-size:11px;padding:12px 6px;border:1px solid var(--bd);border-radius:12px;color:var(--tx2);transition:.3s;position:relative}
+.node.act{color:var(--tx);border-color:var(--vi);box-shadow:0 0 18px rgba(139,92,246,.5);animation:pulse 0.6s infinite alternate}
+.node.done{color:var(--tx);border-color:rgba(34,211,238,.5);background:rgba(34,211,238,.06)}
+.link{flex:0 0 18px;height:2px;background:var(--bd);position:relative;overflow:hidden}
+.link.on:after{content:"";position:absolute;width:8px;height:100%;background:var(--cy);box-shadow:0 0 8px var(--cy);animation:flow .5s linear infinite}@keyframes flow{from{left:-8px}to{left:18px}}
+.row{display:grid;grid-template-columns:92px 90px 1.2fr 1fr .9fr 56px 74px 84px;gap:10px;align-items:center;padding:11px 14px;border-radius:12px;border:1px solid var(--bd);border-left:3px solid var(--c);background:linear-gradient(90deg,color-mix(in srgb,var(--c) 7%,transparent),transparent 40%);margin-bottom:8px;width:100%;text-align:left;transition:.2s;font-size:13px}
+.row:hover{transform:translateY(-1px);border-color:var(--c)}.row.HIGH{box-shadow:-6px 0 18px -8px var(--hi)}
+.row.new{animation:in .5s ease}@keyframes in{from{opacity:0;transform:translateY(-10px)}}
+.row .m{color:var(--tx2)}.tag{font-size:11px;font-weight:700;letter-spacing:.08em}
+.bar{display:grid;grid-template-columns:1fr 44px;gap:10px;align-items:center;margin-bottom:14px;font-size:12px}
+.bar i{display:block;height:6px;border-radius:9px;background:linear-gradient(90deg,var(--vi),var(--hi));width:0;transition:width .9s cubic-bezier(.2,.8,.2,1)}
+.bar div div{background:var(--bd);border-radius:9px;margin-top:6px}
+.mcard{padding:18px;border:1px solid var(--bd);border-radius:16px}.mcard .v{font-size:34px;font-weight:700;letter-spacing:-.03em}.mcard small{color:var(--tx2);display:block;font-size:11px}
+canvas{width:100%;height:240px;display:block}
+.seg button{padding:4px 12px;border-radius:8px;color:var(--tx2);font-size:12px}.seg button.on{background:var(--glass);color:var(--cy);border:1px solid var(--bd)}
+.alert{display:flex;gap:16px;align-items:center;flex-wrap:wrap;padding:16px;border:1px solid var(--bd);border-left:3px solid var(--hi);border-radius:14px;margin-bottom:10px;background:rgba(248,113,113,.05)}
+.alert .s{font-size:26px;font-weight:800;color:var(--hi)}.alert p{color:var(--tx2);font-size:12px}
+.empty{color:var(--tx2);padding:26px;text-align:center;border:1px dashed var(--bd);border-radius:14px}
+.chain{position:relative;padding-left:26px}.chain:before{content:"";position:absolute;left:7px;top:6px;bottom:6px;width:2px;background:linear-gradient(var(--cy),var(--vi))}
+.rec{position:relative;margin-bottom:14px;font-size:12px}.rec:before{content:"";position:absolute;left:-24px;top:8px;width:10px;height:10px;border-radius:50%;background:var(--bg);border:2px solid var(--cy)}
+.hash{font:11px ui-monospace,Menlo,monospace;color:var(--vi);word-break:break-all;margin-top:4px}
+.svc{display:flex;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid var(--bd)}.svc span:last-child{margin-left:auto;color:var(--tx2)}
+.drawer{position:fixed;top:0;right:0;height:100%;width:min(520px,100%);background:rgba(12,16,23,.96);backdrop-filter:blur(20px);border-left:1px solid var(--bd);transform:translateX(105%);transition:transform .4s cubic-bezier(.2,.8,.2,1);z-index:20;overflow:auto;padding:26px}
+.drawer.on{transform:none}.drawer h3{font-size:12px;letter-spacing:.14em;color:var(--tx2);margin:22px 0 10px;font-weight:500}
+.kv{display:grid;grid-template-columns:110px 1fr;gap:6px 10px;font-size:13px}.kv span:nth-child(odd){color:var(--tx2)}
+.acts{display:grid;grid-template-columns:1fr 1fr;gap:8px}.acts button{padding:10px;border:1px solid var(--bd);border-radius:10px;font-size:12px;font-weight:700;letter-spacing:.06em;transition:.2s}.acts button:hover{border-color:var(--cy);background:rgba(34,211,238,.08)}
+.toast{position:fixed;bottom:22px;left:50%;transform:translate(-50%,40px);opacity:0;background:var(--bg2);border:1px solid var(--cy);padding:10px 18px;border-radius:12px;z-index:30;transition:.3s}.toast.on{opacity:1;transform:translate(-50%,0)}
+@media(max-width:900px){body{flex-direction:column}aside{width:100%;flex-direction:row;overflow-x:auto;padding:10px}.logo,.side-foot{display:none}main{height:auto}nav{display:flex}nav button{white-space:nowrap}.hero,.cols{grid-template-columns:1fr}.row{grid-template-columns:80px 1fr 60px 80px}.row .h{display:none}header,section.view{padding-left:16px;padding-right:16px}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+body.pub aside,body.pub main{display:none}body:not(.pub) #pub{display:none}
+#pub{flex:1;height:100vh;overflow:auto;position:relative;z-index:1;scroll-behavior:smooth}
+.wrap{max-width:1120px;margin:auto;padding:0 24px}
+.top{display:flex;align-items:center;padding:18px 0}.top .logo{padding:0}.top nav{margin-left:auto;display:flex;gap:6px}.top nav button{width:auto}
+.lh{display:grid;grid-template-columns:1.1fr 1fr;gap:40px;align-items:center;padding:56px 0 70px}
+.lh h1{font-size:clamp(44px,7vw,84px);font-weight:800;letter-spacing:-.05em;line-height:1}.lh h1 span{background:linear-gradient(90deg,var(--cy),var(--vi));-webkit-background-clip:text;background-clip:text;color:transparent}
+.lh h2{font-size:clamp(16px,2vw,21px);font-weight:300;margin:14px 0 8px}.lh p{color:var(--tx2);max-width:30em}
+.btns{display:flex;gap:12px;flex-wrap:wrap;margin-top:26px}.cta.fill{background:var(--cy);color:#041014;font-weight:800;letter-spacing:.06em;font-size:12px}.cta.fill:hover{background:#67e8f9}.cta.sm{font-size:12px;letter-spacing:.06em}
+.eng .g{display:grid;grid-template-columns:1fr 1fr;gap:12px}.eng .metric .v{font-size:26px}.tag.demo{color:var(--me);border:1px solid var(--me);border-radius:99px;padding:1px 8px;margin-left:8px}
+.ps{padding:60px 0;border-top:1px solid var(--bd)}.ps h3{font-size:clamp(24px,3vw,34px);font-weight:300;letter-spacing:-.02em;margin-bottom:6px}.ps h3 b{font-weight:800}.ps>.wrap>p{color:var(--tx2);margin-bottom:28px;max-width:40em}
+.rv .node{opacity:.25;transform:translateY(8px)}.rv.in .node{opacity:1;transform:none;transition:.5s calc(var(--i)*.15s)}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}.cards .glass{padding:20px}.cards b{display:block;margin-bottom:6px}.cards p{color:var(--tx2);font-size:13px}
+.cards .glass:hover{border-color:rgba(34,211,238,.4);transform:translateY(-2px);transition:.2s}
+footer{border-top:1px solid var(--bd);padding:26px 0 40px;color:var(--tx2);font-size:12px}
+.lg{max-width:420px;margin:7vh auto;padding:0 20px}.lg form{display:flex;flex-direction:column;gap:14px}
+.lg label{font-size:12px;color:var(--tx2);display:block;margin-bottom:5px}
+.lg input[type=email],.lg input[type=password],.lg input[type=text]{width:100%;padding:11px 14px;border-radius:10px;border:1px solid var(--bd);background:rgba(255,255,255,.04);color:var(--tx);font:inherit}
+.lg input:focus{outline:2px solid var(--cy);border-color:transparent}.pw{position:relative}.pw button{position:absolute;right:8px;top:6px;font-size:12px;color:var(--tx2);padding:4px 8px}
+.err{color:var(--hi);font-size:13px;min-height:18px}.note{font-size:12px;color:var(--tx2);border:1px dashed var(--bd);border-radius:12px;padding:12px;margin-top:16px}.note code{color:var(--cy);cursor:pointer}
+.chip{display:flex;gap:8px;align-items:center;border:1px solid var(--bd);border-radius:99px;padding:3px 4px 3px 12px;font-size:12px;background:var(--glass)}.chip small{display:inline;color:var(--cy)}.chip button{border:1px solid var(--bd);border-radius:99px;padding:2px 10px;font-size:11px}.chip button:hover{border-color:var(--hi);color:var(--hi)}
+@media(max-width:900px){.lh{grid-template-columns:1fr}#pub{height:auto;min-height:100vh}}
+</style></head><body class="pub">
+<div id="pub">
+<div id="landing"><div class="wrap">
+<div class="top"><div class="logo"><i></i>Sentinel</div><nav><button data-go="#how" class="sm">Platform</button><button class="cta sm" data-go="/login">Sign in</button></nav></div>
+<div class="lh"><div><div class="lbl">Fraud &amp; risk operations</div><h1><span>SENTINEL</span></h1><h2>Real-Time AI-Powered Transaction Risk Intelligence</h2><p>Detect suspicious financial activity before it becomes fraud.</p>
+<div class="btns"><button class="cta fill" data-go="/login">ACCESS SECURITY DASHBOARD</button><button class="cta" data-go="#how">EXPLORE PLATFORM</button></div></div>
+<div class="glass eng"><div class="lbl">Risk engine <span class="tag demo">DEMO DATA</span></div><div class="g">
+<div class="metric"><div class="lbl">Transactions</div><div class="v num" id="lt">12,481</div></div><div class="metric"><div class="lbl">High risk</div><div class="v num tc HIGH" id="lh">27</div></div>
+<div class="metric"><div class="lbl">Blocked</div><div class="v num" id="lb">14</div></div><div class="metric"><div class="lbl">Avg latency</div><div class="v num" id="ll">18.4ms</div></div></div>
+<div class="pill ai" style="margin-top:14px;width:fit-content"><span class="dot live"></span>AI ENGINE ACTIVE</div></div></div></div>
+<div class="ps" id="how"><div class="wrap"><h3>How <b>Sentinel</b> works</h3><p>Every transaction moves through the same scored, explained and audited pipeline, ending in ALLOW, CHALLENGE, BLOCK or REVIEW.</p><div class="pipe rv" id="lpipe"></div></div></div>
+<div class="ps"><div class="wrap"><h3>Built for <b>analysts</b></h3><p>Capabilities in this build map to the Sentinel pipeline behind it.</p><div class="cards">
+<div class="glass"><b>Real-time risk intelligence</b><p>Live stream of scored transactions with anomaly, scam, velocity, behaviour, device and location signals.</p></div>
+<div class="glass"><b>AI-powered detection</b><p>Isolation Forest and XGBoost outputs combined by a versioned risk engine.</p></div>
+<div class="glass"><b>Explainable decisions</b><p>Ranked risk drivers with point contributions and the policy band that produced each decision.</p></div>
+<div class="glass"><b>Investigation workflow</b><p>Drawer with analyst actions that need confirmation and a reason, and never edit history.</p></div>
+<div class="glass"><b>Security &amp; audit</b><p>Append-only SHA-256 hash chain with one-click chain verification.</p></div>
+<div class="glass"><b>Demo or live</b><p>Runs on mock data, or connects to your backend over secure WebSocket. The mode is always shown.</p></div></div></div></div>
+<div class="ps"><div class="wrap" style="text-align:center"><h3>See the <b>risk engine</b> at work</h3><p style="margin:10px auto 24px">Sign in with a demo role to explore the dashboard.</p><button class="cta fill" data-go="/login">ACCESS SECURITY DASHBOARD</button></div></div>
+<footer><div class="wrap">SENTINEL · Demo environment. Data and metrics shown are simulated unless the header says LIVE.</div></footer></div>
+<div id="login" style="display:none"><div class="lg"><div class="logo" style="padding:0 0 18px"><i></i>Sentinel</div><div class="glass"><div class="lbl">Secure sign-in</div>
+<form id="lf" novalidate><div><label for="em">Email or username</label><input id="em" type="email" autocomplete="username" required></div>
+<div><label for="pw">Password</label><div class="pw"><input id="pw" type="password" autocomplete="current-password" required><button type="button" id="tp">Show</button></div></div>
+<label style="display:flex;gap:8px;align-items:center;margin:0"><input type="checkbox" id="rm"> Remember me</label><div class="err" id="le" role="alert"></div>
+<button class="cta fill" id="ls" style="justify-content:center">SIGN IN</button></form>
+<div class="note"><b>Demo accounts</b> (password <code data-fill="sentinel-demo">sentinel-demo</code>). Click an email to fill:<br><span id="demos"></span><br>Frontend-only demo auth. Replace the <code>Auth</code> adapter with a real provider before production.</div></div>
+<button class="sm" style="margin-top:14px;color:var(--tx2)" data-go="/">&larr; Back to platform</button></div></div></div>
+
+<aside><div class="logo"><i></i>Sentinel</div>
+<nav id="nav"><button data-v="overview" class="on">Overview</button><button data-v="queue">High-Risk Queue <b id="qn">0</b></button><button data-v="audit">Audit Trail</button><button data-v="system">System Health</button></nav>
+<div class="side-foot"><span class="dot"></span> Model v2.4.1 · Policy v1.3<br><b id="mode" style="color:var(--me)"></b></div></aside>
+<main>
+<header><div><h1>Risk Intelligence</h1><small>Real-time transaction monitoring</small></div>
+<div class="pills"><span class="pill ai" id="ai"><span class="dot live"></span><span id="aitx">AI ENGINE ACTIVE</span></span><span class="pill"><span class="dot live"></span>Pipeline operational</span><span class="pill"><span class="dot"></span>Kafka</span><span class="pill"><span class="dot"></span>ML</span><span class="pill"><span class="dot"></span>Feature store</span><span class="chip" id="chip"></span></div></header>
+
+<section class="view on" id="overview">
+<div class="glass hero"><div><h2>Transaction <b>risk intelligence</b></h2><p>AI-powered real-time behavioural and scam detection. Every payment is scored, explained, and written to a tamper-evident audit chain.</p><button class="cta" id="inject">Inject suspicious transaction</button></div>
+<div class="ringwrap" id="ringwrap"><svg viewBox="0 0 300 300"><g class="spin"><circle cx="150" cy="150" r="140" fill="none" stroke="rgba(255,255,255,.1)" stroke-dasharray="2 8"/></g><circle cx="150" cy="150" r="112" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="10"/><circle id="arc" cx="150" cy="150" r="112" fill="none" stroke="var(--cy)" stroke-width="10" stroke-linecap="round" stroke-dasharray="0 704" transform="rotate(-90 150 150)" style="transition:stroke-dasharray 1s cubic-bezier(.2,.8,.2,1),stroke .4s;filter:drop-shadow(0 0 8px currentColor)"/><circle cx="150" cy="150" r="84" fill="none" stroke="rgba(139,92,246,.25)" stroke-dasharray="40 14"/></svg>
+<div class="core" id="core"><div class="lbl" style="margin:0">Risk score</div><div class="big num tc" id="big">--</div><div class="cat tc" id="cat">AWAITING</div></div></div></div>
+
+<div class="grid3" id="metrics"></div>
+
+<div class="glass"><div class="lbl">Live pipeline</div><div class="pipe" id="pipe"></div></div>
+
+<div class="cols"><div class="glass"><div class="lbl">Live transaction stream</div><div id="stream"></div></div>
+<div style="display:flex;flex-direction:column;gap:20px"><div class="glass"><div class="lbl">Why this transaction is risky</div><div id="drivers"><div class="empty">Waiting for first transaction</div></div></div>
+<div class="glass"><div class="lbl">Risk distribution</div><div style="display:flex;gap:18px;align-items:center"><svg viewBox="0 0 120 120" width="120" id="donut"></svg><div id="legend" style="font-size:13px;line-height:2"></div></div></div></div></div>
+
+<div class="grid3" id="models"></div>
+
+<div class="glass"><div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap"><div class="lbl">Risk activity</div><div class="seg" id="seg"><button data-n="30">5M</button><button data-n="60" class="on">15M</button><button data-n="120">1H</button><button data-n="240">6H</button><button data-n="400">24H</button></div></div><canvas id="cv"></canvas></div>
+</section>
+
+<section class="view" id="queue"><div class="glass"><div class="lbl">High-risk alerts</div><div id="alerts"><div class="empty">No high-risk alerts yet. Use “Inject suspicious transaction” on Overview.</div></div></div></section>
+<section class="view" id="audit"><div class="glass"><div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px"><div><div class="lbl">Immutable audit trail</div><p style="color:var(--tx2);font-size:13px;margin-bottom:18px">Records are append-only. Each hash covers the previous hash plus the record, so editing history breaks every later link.</p></div><button class="cta" id="verify" style="height:40px">Verify chain</button></div><div class="chain" id="chain"><div class="empty">No records yet.</div></div></div></section>
+<section class="view" id="system"><div class="glass"><div class="lbl">Services (simulated values in demo mode)</div><div id="svcs"></div></div><div class="grid3" id="sysm"></div></section>
+</main>
+
+<div class="drawer" id="drawer" role="dialog" aria-label="Transaction detail"></div><div class="toast" id="toast"></div>
+
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const inr=n=>"₹"+Number(n).toLocaleString("en-IN");
+const hex=n=>[...Array(n)].map(()=>Math.floor(Math.random()*16).toString(16)).join("").toUpperCase();
+const catOf=s=>s>75?"HIGH":s>=30?"MEDIUM":"LOW";               // policy v1.3 thresholds
+const decOf=c=>({LOW:"ALLOW",MEDIUM:"CHALLENGE",HIGH:"BLOCK"})[c];
+const S={events:[],total:0,cnt:{LOW:0,MEDIUM:0,HIGH:0},sum:0,lat:0,blocks:0,stamps:[],audit:[],cur:null};
+function toast(t){const e=$("#toast");e.textContent=t;e.classList.add("on");setTimeout(()=>e.classList.remove("on"),2200)}
+
+/* ---------- DATA LAYER: swap mock for live backend via ?ws=wss://host/events ---------- */
+const DRV=[["High transaction velocity",28],["New device",21],["Unusual location",17],["Abnormal transaction amount",12],["Suspicious merchant pattern",9]];
+const CITIES=["Chennai","Mumbai","Delhi","Bengaluru","Hyderabad","Pune","Kolkata"],MERCH=["Online Merchant","Grocery","Fuel Station","Electronics","Travel Portal","Food Delivery","Wallet Top-up"];
+function mockEvent(force){
+  const sus=force||Math.random()<.2,k=force?4:2+Math.floor(Math.random()*3);
+  const d=sus?[...DRV].sort(()=>Math.random()-.5).slice(0,k).map(([n,p])=>({name:n,pts:Math.round(p*(.8+Math.random()*.4))})).sort((a,b)=>b.pts-a.pts):[];
+  const score=Math.min(99.4,+(4+Math.random()*20+d.reduce((a,x)=>a+x.pts,0)*(force?1.05:.8)).toFixed(1));
+  const j=()=>Math.min(.99,Math.max(.02,score/100+(Math.random()-.5)*.14));
+  return{event_id:"TXN-"+hex(6),amount:Math.round(sus?40000+Math.random()*160000:200+Math.random()*9000),currency:"INR",risk_score:score,anomaly_score:+j().toFixed(2),scam_probability:+j().toFixed(2),
+  risk_drivers:d,merchant:MERCH[Math.random()*7|0],city:CITIES[Math.random()*7|0],device:d.some(x=>/device/i.test(x.name))?"New device":"Known device",channel:["Web","Mobile","POS"][Math.random()*3|0],user:"U-"+hex(5),
+  model_version:"2.4.1",policy_version:"1.3",latency_ms:+(9+Math.random()*16).toFixed(1),timestamp:new Date().toISOString()};
+}
+function normalize(e){ // adapt real backend schema (risk_drivers may be plain strings)
+  let d=e.risk_drivers||[];if(d.length&&typeof d[0]==="string"){const w=[28,21,17,12,9];d=d.map((n,i)=>({name:n,pts:w[i]||5}))}
+  const c=e.risk_category||catOf(e.risk_score);
+  return{merchant:"—",city:"—",device:"—",channel:"—",user:"—",...e,risk_drivers:d,risk_category:c,decision:e.decision||decOf(c)};
+}
+let busy=Promise.resolve();
+function ingest(raw){busy=busy.then(()=>process(normalize(raw)))}
+const NODES=["Transaction","Feature engine","Behaviour","Isolation Forest","Scam detection","XGBoost","Risk engine","Decision"];
+async function process(e){
+  const ai=$("#ai");ai.classList.add("busy");$("#aitx").textContent="ANALYZING TRANSACTION…";
+  const ns=$$(".node"),ls=$$(".link");ns.forEach(n=>n.className="node");ls.forEach(l=>l.className="link");
+  for(let i=0;i<ns.length;i++){ns[i].classList.add("act");if(ls[i-1])ls[i-1].classList.add("on");await new Promise(r=>setTimeout(r,e.risk_score>75?170:70));ns[i].className="node done"}
+  ls.forEach(l=>l.className="link");commit(e);ai.classList.remove("busy");$("#aitx").textContent="RISK ASSESSMENT COMPLETE";setTimeout(()=>$("#aitx").textContent="AI ENGINE ACTIVE",1400);
+}
+/* ---------- STATE + RENDER ---------- */
+function commit(e){
+  S.events.unshift(e);S.events=S.events.slice(0,400);S.total++;S.cnt[e.risk_category]++;S.sum+=e.risk_score;S.lat+=e.latency_ms;if(e.decision==="BLOCK")S.blocks++;S.stamps.push(Date.now());
+  S.cur=e;showHero(e);renderStream(e);renderMetrics();renderDonut();drawChart();
+  if(e.risk_category==="HIGH")renderAlerts();
+  appendAudit({type:"DECISION",event_id:e.event_id,risk_score:e.risk_score,decision:e.decision,model_version:e.model_version,policy_version:e.policy_version});
+}
+function countTo(el,to,fmt){const from=parseFloat(el.dataset.v)||0,t0=performance.now();el.dataset.v=to;(function f(t){const p=Math.min(1,(t-t0)/700),v=from+(to-from)*(1-Math.pow(1-p,3));el.textContent=fmt(v);if(p<1)requestAnimationFrame(f)})(t0)}
+function showHero(e){
+  const w=$("#ringwrap");w.className="ringwrap "+e.risk_category;$("#big").dataset.v=$("#big").dataset.v||0;countTo($("#big"),e.risk_score,v=>v.toFixed(1)+"%");
+  $("#cat").textContent=e.risk_category+" RISK";const a=$("#arc");a.style.stroke=`var(--c)`;a.setAttribute("stroke-dasharray",`${704*e.risk_score/100} 704`);a.style.color=`var(--c)`;
+  const dv=n=>Math.min(99,Math.round(e.risk_drivers.filter(x=>RegExp(n,"i").test(x.name)).reduce((a,x)=>a+x.pts*3,8)));
+  const sats=[["Anomaly",Math.round(e.anomaly_score*100)],["Scam probability",Math.round(e.scam_probability*100)],["Velocity",dv("velocity")],["Behaviour",dv("amount|merchant")],["Device",dv("device")],["Location",dv("location")]];
+  $$(".sat").forEach(x=>x.remove());sats.forEach(([n,v],i)=>{const an=(i/6)*2*Math.PI-Math.PI/2,s=document.createElement("div");s.className="sat";s.style.left=50+50*Math.cos(an)*1.04+"%";s.style.top=50+50*Math.sin(an)*1.04+"%";s.innerHTML=`${n}<b class="num">${v}%</b>`;w.append(s)});
+  $("#drivers").innerHTML=e.risk_drivers.length?e.risk_drivers.map(d=>`<div class="bar"><div>${d.name}<div><i data-w="${Math.min(100,d.pts*3)}"></i></div></div><b class="num">+${d.pts}</b></div>`).join(""):'<div class="empty">No significant risk drivers. Transaction approved.</div>';
+  requestAnimationFrame(()=>$$("#drivers i").forEach(i=>i.style.width=i.dataset.w+"%"));
+  $("#models").innerHTML=[["Isolation Forest","Behavioural anomaly",Math.round(e.anomaly_score*100)+"%",e.anomaly_score>.7?"ANOMALOUS":"WITHIN NORMAL RANGE"],["XGBoost","Scam probability",Math.round(e.scam_probability*100)+"%",e.scam_probability>.7?"HIGH CONFIDENCE":"LOW CONFIDENCE"],["Risk engine","Final score",e.risk_score.toFixed(1)+"%",e.risk_category+" RISK"]].map(([a,b,v,s],i)=>`<div class="glass mcard ${i==2?e.risk_category:""}"><div class="lbl">${a}</div><small>${b}</small><div class="v num ${i==2?"tc":""}">${v}</div><div class="tag ${i==2?"tc":""}">${s}</div><small style="margin-top:8px">Model v${e.model_version} · inference ${(e.latency_ms*.4).toFixed(1)} ms</small></div>`).join("");
+}
+function rowHTML(e,cls=""){return`<button class="row ${e.risk_category} ${cls}" data-id="${e.event_id}"><b>${e.event_id}</b><span class="num">${inr(e.amount)}</span><span>${e.merchant}</span><span class="m h">${e.city} · ${e.device}</span><span class="m h num">${new Date(e.timestamp).toLocaleTimeString()}</span><b class="num tc">${Math.round(e.risk_score)}%</b><span class="tag tc">${e.risk_category}</span><span class="tag">${e.decision}</span></button>`}
+function renderStream(e){const s=$("#stream");s.insertAdjacentHTML("afterbegin",rowHTML(e,"new"));while(s.children.length>9)s.lastChild.remove()}
+function renderAlerts(){const hi=S.events.filter(e=>e.risk_category==="HIGH");$("#qn").textContent=hi.length;
+  $("#alerts").innerHTML=hi.slice(0,30).map(e=>`<div class="alert"><div class="s num">${Math.round(e.risk_score)}%</div><div style="flex:1;min-width:200px"><b>${e.event_id} · ${inr(e.amount)}</b><p>${e.risk_drivers.slice(0,2).map(d=>d.name).join(" + ")} · ${e.city}</p></div><span class="tag">${e.decision}</span><button class="cta" data-id="${e.event_id}">View investigation</button></div>`).join("")}
+function renderMetrics(){const now=Date.now();S.stamps=S.stamps.filter(t=>now-t<60000);const n=S.total||1;
+  const M=[["Total transactions",S.total.toLocaleString()],["Per minute",S.stamps.length],["High-risk events",S.cnt.HIGH],["Avg risk score",(S.sum/n).toFixed(1)+"%"],["Block rate",(S.blocks/n*100).toFixed(1)+"%"],["Avg latency",(S.lat/n).toFixed(1)+" ms"]];
+  const pts=S.events.slice(0,24).reverse().map((e,i)=>`${i*5},${24-e.risk_score*.22}`).join(" ");
+  $("#metrics").innerHTML=M.map(([a,b])=>`<div class="metric"><div class="lbl" style="margin-bottom:6px">${a}</div><div class="v num">${b}</div><svg viewBox="0 0 115 24" preserveAspectRatio="none"><polyline points="${pts}" fill="none" stroke="var(--cy)" stroke-width="1.5" opacity=".7"/></svg></div>`).join("")}
+function renderDonut(){const t=S.total||1;let off=0;const C=2*Math.PI*46;
+  $("#donut").innerHTML=["LOW","MEDIUM","HIGH"].map(k=>{const f=S.cnt[k]/t,x=`<circle cx="60" cy="60" r="46" fill="none" stroke="var(--${k[0]=="L"?"lo":k[0]=="M"?"me":"hi"})" stroke-width="12" stroke-dasharray="${f*C} ${C}" stroke-dashoffset="${-off*C}" transform="rotate(-90 60 60)" style="transition:.8s"/>`;off+=f;return x}).join("");
+  $("#legend").innerHTML=["LOW","MEDIUM","HIGH"].map(k=>`<div><span class="tag" style="color:var(--${k[0]=="L"?"lo":k[0]=="M"?"me":"hi"})">${k}</span> <b class="num">${Math.round(S.cnt[k]/t*100)}%</b></div>`).join("")}
+let win=60;
+function drawChart(){const c=$("#cv"),r=devicePixelRatio||1,W=c.clientWidth,H=c.clientHeight;c.width=W*r;c.height=H*r;const g=c.getContext("2d");g.scale(r,r);g.clearRect(0,0,W,H);
+  const d=S.events.slice(0,win).reverse();g.strokeStyle="rgba(255,255,255,.07)";g.fillStyle="#8B93A7";g.font="11px Manrope";
+  [0,30,75,100].forEach(v=>{const y=H-20-(H-30)*v/100;g.beginPath();g.moveTo(30,y);g.lineTo(W,y);g.stroke();g.fillText(v,4,y+3)});
+  if(d.length<2)return;const X=i=>30+(W-40)*i/(d.length-1),Y=v=>H-20-(H-30)*v/100;
+  const gr=g.createLinearGradient(0,0,0,H);gr.addColorStop(0,"rgba(34,211,238,.25)");gr.addColorStop(1,"transparent");
+  g.beginPath();d.forEach((e,i)=>i?g.lineTo(X(i),Y(e.risk_score)):g.moveTo(X(i),Y(e.risk_score)));g.strokeStyle="#22d3ee";g.lineWidth=1.6;g.stroke();g.lineTo(X(d.length-1),H-20);g.lineTo(X(0),H-20);g.fillStyle=gr;g.fill();
+  d.forEach((e,i)=>{if(e.risk_score>75){g.beginPath();g.arc(X(i),Y(e.risk_score),4,0,7);g.fillStyle="#f87171";g.shadowColor="#f87171";g.shadowBlur=10;g.fill();g.shadowBlur=0}})}
+/* ---------- DRAWER + ANALYST ACTIONS ---------- */
+function open(id){const e=S.events.find(x=>x.event_id===id);if(!e)return;const a=S.audit.find(x=>x.p.event_id===id);
+  $("#drawer").innerHTML=`<button class="cta" id="close" style="float:right">Close</button><div class="lbl">Transaction ${e.event_id}</div><div class="${e.risk_category}"><div class="num tc" style="font-size:52px;font-weight:800;letter-spacing:-.04em">${e.risk_score.toFixed(1)}%</div><b class="tc">${e.risk_category} RISK · ${e.decision}</b></div>
+  <h3>TRANSACTION</h3><div class="kv"><span>Amount</span><span class="num">${inr(e.amount)}</span><span>Merchant</span><span>${e.merchant}</span><span>Location</span><span>${e.city}</span><span>Device</span><span>${e.device}</span><span>Channel</span><span>${e.channel}</span><span>User</span><span>${e.user}</span><span>Time</span><span>${e.timestamp}</span></div>
+  <h3>AI ANALYSIS</h3><div class="kv"><span>Isolation Forest</span><span class="num">${e.anomaly_score}</span><span>XGBoost</span><span class="num">${e.scam_probability}</span></div>
+  <h3>RISK DRIVERS</h3>${e.risk_drivers.map(d=>`<div class="kv"><span style="grid-column:span 1">+${d.pts}</span><span>${d.name}</span></div>`).join("")||"<small>None</small>"}
+  <h3>DECISION EXPLANATION</h3><p style="color:var(--tx2)">Score ${e.risk_score.toFixed(1)} falls in the ${e.risk_category} band (policy v${e.policy_version}: LOW &lt;30, MEDIUM 30–75, HIGH &gt;75), so the engine chose ${e.decision}.</p>
+  <h3>AUDIT</h3><div class="kv"><span>Event ID</span><span>${e.event_id}</span><span>Model</span><span>v${e.model_version}</span><span>Policy</span><span>v${e.policy_version}</span></div><div class="hash">${a?a.hash:"pending…"}</div>
+  <h3>ANALYST ACTIONS</h3>${Auth.can("act")?`<div class="acts">${["APPROVE","BLOCK","CHALLENGE","ESCALATE","MARK FRAUD","MARK LEGITIMATE"].map(x=>`<button data-act="${x}">${x}</button>`).join("")}</div>`:`<div class="empty">Read-only role: analyst actions are disabled.</div>`}`;
+  $("#drawer").classList.add("on");$("#close").focus();
+  $$("[data-act]").forEach(b=>b.onclick=()=>{const act=b.dataset.act;if(!confirm(`${act} for ${e.event_id}?`))return;const reason=prompt("Reason (required):");if(!reason)return toast("Reason required — action cancelled");
+    appendAudit({type:"OVERRIDE",event_id:e.event_id,analyst:Auth.user().id,role:Auth.user().role,original_decision:e.decision,new_decision:act,reason});toast(act+" recorded as a new audit event")})}
+/* ---------- AUDIT: SHA-256 hash chain ---------- */
+async function sha(t){return[...new Uint8Array(await crypto.subtle.digest("SHA-256",new TextEncoder().encode(t)))].map(b=>b.toString(16).padStart(2,"0")).join("")}
+async function appendAudit(p){p={...p,ts:new Date().toISOString()};const prev=S.audit.length?S.audit[S.audit.length-1].hash:"GENESIS";const hash=await sha(prev+JSON.stringify(p));S.audit.push({id:S.audit.length+1,p,prev,hash});renderAudit()}
+function renderAudit(){$("#chain").innerHTML=S.audit.slice(-40).reverse().map(r=>`<div class="rec"><b>#${r.id} ${r.p.type}</b> · ${r.p.event_id} · ${r.p.risk_score!=null?r.p.risk_score+"% · ":""}${r.p.decision||r.p.new_decision} ${r.p.reason?"· “"+r.p.reason+"”":""}<div style="color:var(--tx2)">${r.p.ts}${r.p.model_version?" · model v"+r.p.model_version+" · policy v"+r.p.policy_version:""}</div><div class="hash">${r.hash}</div></div>`).join("")}
+$("#verify").onclick=async()=>{let prev="GENESIS";for(const r of S.audit){if(r.prev!==prev||await sha(prev+JSON.stringify(r.p))!==r.hash)return toast("Chain broken at record #"+r.id);prev=r.hash}toast(`Chain intact · ${S.audit.length} records verified`)};
+/* ---------- SYSTEM HEALTH (simulated) ---------- */
+const SV=["TCP socket","Kafka","Redis feature store","Isolation Forest","XGBoost","Risk engine","Audit store","Dashboard stream"];
+$("#svcs").innerHTML=SV.map(s=>`<div class="svc"><span class="dot"></span><span>${s}</span><span>Operational</span></div>`).join("");
+setInterval(()=>{const r=(a,b)=>(a+Math.random()*(b-a)).toFixed(1);$("#sysm").innerHTML=[["Latency (p95)",r(14,24)+" ms"],["Throughput",(S.stamps.length||0)+" tx/min"],["Workers","4"],["Kafka lag",Math.floor(Math.random()*12)],["ML inference",r(5,10)+" ms"],["Feature store",r(.6,1.8)+" ms"]].map(([a,b])=>`<div class="metric"><div class="lbl">${a}</div><div class="v num">${b}</div></div>`).join("");renderMetrics()},2000);
+/* ---------- WIRING ---------- */
+$("#pipe").innerHTML=NODES.map((n,i)=>`${i?'<div class="link"></div>':""}<div class="node">${n}</div>`).join("");
+function showView(v){$$("nav button").forEach(b=>b.classList.toggle("on",b.dataset.v===v));$$("section.view").forEach(s=>s.classList.toggle("on",s.id===v));if(v==="audit")renderAudit();if(v==="overview")setTimeout(drawChart,50)}
+$("#nav").onclick=e=>{const v=e.target.closest("button")?.dataset.v;if(v)go(PATH[v])};
+document.addEventListener("click",e=>{const r=e.target.closest("[data-id]");if(r)open(r.dataset.id);if(e.target.closest("#close"))$("#drawer").classList.remove("on")});
+document.addEventListener("keydown",e=>{if(e.key==="Escape")$("#drawer").classList.remove("on")});
+$("#seg").onclick=e=>{const b=e.target.closest("button");if(!b)return;win=+b.dataset.n;$$("#seg button").forEach(x=>x.classList.toggle("on",x===b));drawChart()};
+$("#inject").onclick=()=>ingest(mockEvent(true));
+addEventListener("resize",drawChart);renderMetrics();renderDonut();
+/* ---------- STREAM (starts only after authentication) ---------- */
+const wsUrl=new URLSearchParams(location.search).get("ws")||(window.SENTINEL_WS_URL||"");let sock,tmr,run=false;
+function validEvent(m){return m&&typeof m==="object"&&Number.isFinite(+m.risk_score)&&m.risk_score>=0&&m.risk_score<=100}
+function startStream(){if(run)return;run=true;
+  if(wsUrl){const set=t=>$("#mode").textContent=t;set("LIVE: connecting…");const c=()=>{if(!run)return;sock=new WebSocket(wsUrl);sock.onopen=()=>set("● LIVE MODE");
+    sock.onmessage=m=>{try{const d=JSON.parse(m.data);if(validEvent(d))ingest(d);else console.warn("Ignored invalid event")}catch{console.warn("Ignored malformed message")}};
+    sock.onclose=()=>{if(run){set("LIVE: disconnected, reconnecting…");setTimeout(c,2000)}}};c()}
+  else{$("#mode").textContent="● DEMO MODE (mock data)";setTimeout(()=>run&&ingest(mockEvent()),600);tmr=setInterval(()=>ingest(mockEvent()),3200)}}
+function stopStream(){run=false;clearInterval(tmr);try{sock&&sock.close()}catch{}}
+
+/* ---------- AUTH: isolated adapter. Swap `Auth.provider` for a real backend (Auth.js, Supabase, OIDC). ---------- */
+const ROLE_VIEWS={ADMIN:["overview","queue","audit","system"],SECURITY_ANALYST:["overview","queue","audit","system"],FRAUD_ANALYST:["overview","queue"],AUDITOR:["overview","audit"],VIEWER:["overview"]};
+const ROLE_ACT=["ADMIN","SECURITY_ANALYST","FRAUD_ANALYST"];
+const Auth={
+  provider:{ // DEMO ONLY: credentials live in the browser, so this is NOT secure. Replace with a server call returning a session.
+    users:[["admin@sentinel.demo","Avery Admin","ADMIN"],["security@sentinel.demo","Sam Security","SECURITY_ANALYST"],["fraud@sentinel.demo","Farah Fraud","FRAUD_ANALYST"],["auditor@sentinel.demo","Alex Auditor","AUDITOR"],["viewer@sentinel.demo","Val Viewer","VIEWER"]],
+    PW:"5d875329915f0dd4c0de950fd586d61dbc56e35ef04dd27b685d9a887bd644d1",
+    async login(id,pw){await new Promise(r=>setTimeout(r,700));const u=this.users.find(x=>x[0]===id.trim().toLowerCase());
+      if(!u||await sha(pw)!==this.PW)throw new Error("Invalid credentials");return{id:u[0],name:u[1],role:u[2],login:new Date().toISOString(),exp:Date.now()+8*36e5}}},
+  user(){for(const s of[sessionStorage,localStorage]){try{const u=JSON.parse(s.getItem("sentinel.session")||"null");if(u&&u.exp>Date.now()&&ROLE_VIEWS[u.role])return u}catch{}}return null},
+  save(u,remember){try{(remember?localStorage:sessionStorage).setItem("sentinel.session",JSON.stringify(u))}catch{}},
+  clear(){for(const s of[sessionStorage,localStorage])try{s.removeItem("sentinel.session")}catch{}},
+  allowed(v){const u=this.user();return !!u&&ROLE_VIEWS[u.role].includes(v)},
+  can(a){const u=this.user();return !!u&&a==="act"&&ROLE_ACT.includes(u.role)}};
+
+/* ---------- ROUTER (history API; vercel.json rewrites all paths to index.html) ---------- */
+const PATH={overview:"/dashboard",queue:"/queue",audit:"/audit",system:"/system"},VIEW=Object.fromEntries(Object.entries(PATH).map(([k,v])=>[v,k]));
+const FUTURE=["/transactions","/investigations","/database","/models","/settings"];let next=null;
+function go(p,replace){if(p[0]==="#"){const t=$(p);if(t)t.scrollIntoView();return}history[replace?"replaceState":"pushState"]({},"",p);route()}
+function pub(which){document.body.classList.add("pub");$("#landing").style.display=which==="landing"?"":"none";$("#login").style.display=which==="login"?"":"none";$("#pub").scrollTo(0,0)}
+function route(){const p=location.pathname.replace(/\/$/,"")||"/",u=Auth.user();
+  if(p==="/"){pub("landing");return}
+  if(p==="/login"){if(u)return go("/dashboard",true);pub("login");return}
+  if(!VIEW[p]&&!FUTURE.includes(p))return go("/",true);
+  if(!u){next=p;return go("/login",true)}
+  const v=VIEW[p];if(!v){toast("This module is not available in this build yet");return go("/dashboard",true)}
+  if(!Auth.allowed(v)){toast("Access denied for role "+u.role.replace("_"," "));if(!Auth.allowed("overview"))return;return go("/dashboard",true)}
+  document.body.classList.remove("pub");
+  $$("#nav button").forEach(b=>b.style.display=Auth.allowed(b.dataset.v)?"":"none");
+  $("#chip").innerHTML=`<span>${u.name} · <small>${u.role.replace("_"," ")}</small></span><button id="lo">Logout</button>`;
+  showView(v);startStream()}
+function logout(){stopStream();Auth.clear();$("#drawer").classList.remove("on");toast("Signed out");go("/",true)}
+addEventListener("popstate",route);
+document.addEventListener("click",e=>{const g=e.target.closest("[data-go]");if(g)go(g.dataset.go);if(e.target.closest("#lo"))logout();const f=e.target.closest("[data-fill]");if(f){$("#pw").value=f.dataset.fill}const d=e.target.closest("[data-em]");if(d){$("#em").value=d.dataset.em;$("#pw").value="sentinel-demo"}});
+$("#demos").innerHTML=Auth.provider.users.map(u=>`<div><code data-em="${u[0]}">${u[0]}</code> · ${u[2].replace("_"," ")}</div>`).join("");
+$("#tp").onclick=()=>{const p=$("#pw"),h=p.type==="password";p.type=h?"text":"password";$("#tp").textContent=h?"Hide":"Show"};
+$("#lf").onsubmit=async e=>{e.preventDefault();const em=$("#em").value,pw=$("#pw").value,er=$("#le"),b=$("#ls");er.textContent="";
+  if(!/^\S+@\S+\.\S+$/.test(em)||!pw){er.textContent="Enter a valid email and password.";return}
+  b.disabled=true;b.textContent="AUTHENTICATING…";
+  try{const u=await Auth.provider.login(em,pw);b.textContent="VERIFYING ROLE…";await new Promise(r=>setTimeout(r,500));Auth.save(u,$("#rm").checked);$("#pw").value="";const t=next&&Auth.allowed(VIEW[next])?next:"/dashboard";next=null;go(t,true)}
+  catch(x){er.textContent=x.message==="Invalid credentials"?"Invalid email or password.":"Sign-in unavailable. Try again."}
+  finally{b.disabled=false;b.textContent="SIGN IN"}};
+
+/* ---------- LANDING ANIMATION ---------- */
+$("#lpipe").style.cssText="";$("#lpipe").innerHTML=["Transaction","Feature extraction","Behaviour analysis","AI models","Risk scoring","Policy engine","ALLOW / CHALLENGE / BLOCK / REVIEW"].map((n,i)=>`${i?'<div class="link"></div>':""}<div class="node" style="--i:${i}">${n}</div>`).join("");
+new IntersectionObserver((en,o)=>en.forEach(x=>{if(x.isIntersecting){x.target.classList.add("in");o.unobserve(x.target)}}),{threshold:.3}).observe($("#lpipe"));
+let lt=12481,lh=27,lb=14;setInterval(()=>{if(!document.body.classList.contains("pub"))return;lt+=1+Math.floor(Math.random()*6);if(Math.random()<.08){lh++;if(Math.random()<.5)lb++}
+  $("#lt").textContent=lt.toLocaleString();$("#lh").textContent=lh;$("#lb").textContent=lb;$("#ll").textContent=(16+Math.random()*5).toFixed(1)+"ms"},1500);
+route();
+</script></body></html>
