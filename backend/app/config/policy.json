@@ -1,0 +1,18 @@
+{
+  "policy_version": "1.0.0",
+  "thresholds": {"medium": 30.0, "high": 75.0},
+  "actions": {"LOW": "ALLOW", "MEDIUM": "CHALLENGE", "HIGH": "BLOCK"},
+  "default_weights": {"w_ml": 0.60, "w_amount": 0.15, "w_velocity": 0.15, "w_rule": 0.10, "anomaly_share": 0.30},
+  "velocity": {"limit_5m": 6, "limit_15m": 12},
+  "required_fields": ["transaction_id", "user_id", "amount", "currency", "merchant_id", "device_id", "event_time"],
+  "lists": {"blacklist_users": [], "blacklist_merchants": ["M-BLACKLISTED-1"], "suspicious_ip_prefixes": ["10.66."], "sanctioned_countries": ["KP", "IR"]},
+  "rules": [
+    {"id": "BLACKLIST_USER", "label": "Blacklisted customer", "all": [{"field": "user_id", "op": "in_list", "value": "blacklist_users"}], "points": 100, "hard": true, "action": "BLOCK"},
+    {"id": "BLACKLIST_MERCHANT", "label": "Blacklisted merchant", "all": [{"field": "merchant_id", "op": "in_list", "value": "blacklist_merchants"}], "points": 100, "hard": true, "action": "BLOCK"},
+    {"id": "SANCTIONED_REGION", "label": "Sanctioned/high-risk region", "all": [{"field": "country", "op": "in_list", "value": "sanctioned_countries"}], "points": 100, "hard": true, "action": "REVIEW"},
+    {"id": "SUSPICIOUS_IP", "label": "Suspicious network source", "all": [{"field": "ip_suspicious", "op": "eq", "value": 1}], "points": 40, "hard": false},
+    {"id": "EXCESS_VELOCITY", "label": "Excessive transaction velocity", "all": [{"field": "txn_count_5m", "op": "gte", "value": 8}], "points": 50, "hard": false},
+    {"id": "AMOUNT_LIMIT", "label": "Amount exceeds configured limit", "all": [{"field": "amount", "op": "gt", "value": 200000}], "points": 60, "hard": false},
+    {"id": "IMPOSSIBLE_TRAVEL", "label": "Impossible travel (country change within 10 min)", "all": [{"field": "location_deviation", "op": "gte", "value": 1.0}, {"field": "secs_since_last", "op": "lt", "value": 600}], "points": 60, "hard": false}
+  ]
+}

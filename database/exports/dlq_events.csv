@@ -1,0 +1,2 @@
+id,event_id,stage,error,payload_hash,created_at
+1,2a6e9330-7306-4508-b1d3-d4038cb0e30d,VALIDATION,"missing required field: user_id; missing required field: currency; missing required field: merchant_id; missing required field: device_id; missing required field: event_time; amount must be a finite number in (0, 1e9]",98f5b1f71963a98f5509d0fc800fcf338610a225b5b991861035b15286318766,2026-10-04T10:23:13.204831+00:00

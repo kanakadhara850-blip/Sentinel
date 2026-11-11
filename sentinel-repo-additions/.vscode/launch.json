@@ -1,0 +1,14 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    { "name": "Run everything (backend + frontend)", "type": "debugpy", "request": "launch",
+      "program": "${workspaceFolder}/run.py", "console": "integratedTerminal" },
+    { "name": "Backend only", "type": "debugpy", "request": "launch", "module": "app.main",
+      "cwd": "${workspaceFolder}/backend", "console": "integratedTerminal" },
+    { "name": "Traffic simulator (live)", "type": "debugpy", "request": "launch",
+      "program": "${workspaceFolder}/backend/scripts/simulate.py",
+      "args": ["live", "--rate", "5", "--fraud-rate", "0.15"],
+      "cwd": "${workspaceFolder}/backend", "env": { "PYTHONPATH": "${workspaceFolder}/backend" },
+      "console": "integratedTerminal" }
+  ]
+}
